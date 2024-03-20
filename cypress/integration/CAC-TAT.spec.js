@@ -2,17 +2,20 @@
 
 
 describe("Central de Atendimento ao Cliente TAT", function () {
+    const TRHEE_SECONDS_IN_MS = 3000
     beforeEach(() => {
         cy.visit("./src/index.html");
     })
 
-    it.only("verifica o título da aplicação", function () {
+    it("verifica o título da aplicação", function () {
         cy.title().should("be.equal", "Central de Atendimento ao Cliente TAT");
     })
 
-    it.only("Preenche os campos obrigatórios e envia o formulário", function () {
+    it("Preenche os campos obrigatórios e envia o formulário", function () {
         const logtext =
             "lorem ipsum dolor sit amet, consectetur adip occurence odio erat, consectetur adip dolor sit amet, consectetur adip";
+         //Com a funcinalidade cy.clock(), você pode "congelar" o relógio do navegador. 
+        cy.clock()
 
         cy.get("#firstName").type("Erika")
         cy.get("#lastName").type("Dias")
@@ -20,22 +23,35 @@ describe("Central de Atendimento ao Cliente TAT", function () {
         cy.get("#open-text-area").type(logtext, { delay: 0 })
         cy.contains("button", "Enviar").click()
         cy.get(".success").should("be.visible")
+
+        //Com a funcionalidade cy.tick(), você pode avançar no tempo.
+        cy.tick(TRHEE_SECONDS_IN_MS)
+        cy.get(".success").should("not.be.visible")
     })
 
-    it.only("exibe mensagem de erro ao submeter o formulário com um email com formatação inválida", function () {
+    it("exibe mensagem de erro ao submeter o formulário com um email com formatação inválida", function () {
+        //Com a funcinalidade cy.clock(), você pode "congelar" o relógio do navegador. 
+        cy.clock()
+
         cy.get("#firstName").type("Erika")
         cy.get("#lastName").type("Dias")
         cy.get("#email").type("erika@exemplo,com")
         cy.get("#open-text-area").type("teste")
         cy.contains("button", "Enviar").click()
         cy.get(".error").should("be.visible")
+
+        //Com a funcionalidade cy.tick(), você pode avançar no tempo. 
+        cy.tick(TRHEE_SECONDS_IN_MS)
+        cy.get(".error").should("not.be.visible")
     })
 
-    it.only("Campo de telefone continua vazio", () => {
+    it("Campo de telefone continua vazio", () => {
         cy.get("#phone").type("Abcefgij").should("have.value", "")
     })
 
-    it.only("exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulári", () => {
+    it("exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulári", () => {
+        cy.clock()
+
         cy.get("#firstName").type("Erika")
         cy.get("#lastName").type("Dias")
         cy.get("#email").type("erika@exemplo.com")
@@ -43,9 +59,12 @@ describe("Central de Atendimento ao Cliente TAT", function () {
         cy.get("#open-text-area").type("teste")
         cy.contains("button", "Enviar").click()
         cy.get(".error").should("be.visible")
+
+        cy.tick(TRHEE_SECONDS_IN_MS)
+        cy.get(".error").should("not.be.visible")
     })
 
-    it.only("preenche e limpa os campos nome, sobrenome, email e telefone", () => {
+    it("preenche e limpa os campos nome, sobrenome, email e telefone", () => {
         cy.get("#firstName")
             .type("Erika")
             .should("have.value", "Erika")
@@ -68,41 +87,57 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             .should("have.value", "")
     })
 
-    it.only("exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios.", () => {
+    it("exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios.", () => {
+        cy.clock()
         cy.contains("button", "Enviar").click()
         cy.get(".error").should("be.visible")
+        cy.tick(TRHEE_SECONDS_IN_MS)
+        cy.get(".error").should("not.be.visible")
     })
 
-    it.only("envia o formuário com sucesso usando um comando customizado", () => {
-        cy.fillMandatoryFieldsAndSubmit()
-        cy.get(".success").should("be.visible")
+    //A funcionalidade _.times() serve para você executar uma função de callback um certo número de vezes, onde o número de vezes é o primeiro argumento, e a função de callback é o segundo.
+    Cypress._.times(5, () => {
+        it("envia o formuário com sucesso usando um comando customizado", () => {
+            cy.clock()
+            cy.fillMandatoryFieldsAndSubmit()
+            cy.get(".success").should("be.visible")
+            cy.tick(TRHEE_SECONDS_IN_MS)
+            cy.get(".success").should("not.be.visible")
+        })
     })
+    // it("envia o formuário com sucesso usando um comando customizado", () => {
+    //     cy.clock()
+    //     cy.fillMandatoryFieldsAndSubmit()
+    //     cy.get(".success").should("be.visible")
+    //     cy.tick(TRHEE_SECONDS_IN_MS)
+    //     cy.get(".success").should("not.be.visible")
+    // })
 
-    it.only('seleciona um produto (YouTube) por seu texto', () => {
+    it('seleciona um produto (YouTube) por seu texto', () => {
         cy.get('#product')
             .select('YouTube')
             .should('have.value', 'youtube')
     });
 
-    it.only('seleciona um produto (Mentoria) por seu valor (value)', () => {
+    it('seleciona um produto (Mentoria) por seu valor (value)', () => {
         cy.get('#product')
             .select('mentoria')
             .should('have.value', 'mentoria')
     });
     
-    it.only('seleciona um produto (Blog) por seu índice', () => {
+    it('seleciona um produto (Blog) por seu índice', () => {
         cy.get('#product')
             .select(1)
             .should('have.value', 'blog')
     });
 
-    it.only('marca o tipo de atendimento "Feedback"', () => {
+    it('marca o tipo de atendimento "Feedback"', () => {
         cy.get('input[type="radio"][value="feedback"]')
         .check()
         .should('have.value', 'feedback')
     });
 
-    it.only('marca cada tipo de atendimento', () => {
+    it('marca cada tipo de atendimento', () => {
         cy.get('input[type="radio"]')
             .should('have.length', 3)
             .each(function($radio) {
@@ -111,7 +146,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             })
     });
 
-    it.only('marca ambos checkboxes, depois desmarca o último', () => {
+    it('marca ambos checkboxes, depois desmarca o último', () => {
         cy.get('#check input[type="checkbox"]')
             .check()
             .should('be.checked')
@@ -120,7 +155,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             .should('not.be.checked')                 
     });
 
-    it.only('marca ambos checkboxes, depois desmarca com uncheck() com value', () => {
+    it('marca ambos checkboxes, depois desmarca com uncheck() com value', () => {
         cy.get('#check input[type="checkbox"]')
             .check()
             .should('be.checked')
@@ -128,7 +163,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             .should('not.be.checked')                 
     });
 
-    it.only('Seleciona um arquivo da pasta fixtures', () => {
+    it('Seleciona um arquivo da pasta fixtures', () => {
         cy.get('input[type="file"]#file-upload')
             .selectFile('cypress/fixtures/example.txt')
             .then(input => {
@@ -137,7 +172,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             })
     });
 
-    it.only('seleciona um arquivo simulando um drag-and-drop', () => {
+    it('seleciona um arquivo simulando um drag-and-drop', () => {
         cy.get('input[type="file"]')
             .selectFile('cypress/fixtures/example.txt', { action: 'drag-drop'})
             .then(input => {
@@ -145,7 +180,7 @@ describe("Central de Atendimento ao Cliente TAT", function () {
             })
     });
 
-    it.only('seleciona um arquivo utilizando uma fixture para a qual foi dada um alias', () => {
+    it('seleciona um arquivo utilizando uma fixture para a qual foi dada um alias', () => {
         cy.fixture('example.txt').as('mydocument')
         cy.get('input[type=file]').selectFile('@mydocument')
         .then(input => {
@@ -153,15 +188,62 @@ describe("Central de Atendimento ao Cliente TAT", function () {
         })
     });
 
-    it.only('verifica que a política de privacidade abre em outra aba sem a necessidade de um clique', ()=>{
+    it('verifica que a política de privacidade abre em outra aba sem a necessidade de um clique', ()=>{
         cy.get('#privacy a').should('have.attr', 'target', '_blank')
     })
 
-    it.only('acessa a página da política de privacidade removendo o target e então clicando no link', () => {
+    it('acessa a página da política de privacidade removendo o target e então clicando no link', () => {
         cy.get('#privacy a')
             .invoke('removeAttr', 'target')
             .click();
             cy.contains('CAC TAT - Política de privacidade').should('be.visible')
     })
 
+    it('exibe e esconde as mensagens de sucesso e erro usando o .invoke', () => {
+        cy.get('.success')
+          .should('not.be.visible')
+          .invoke('show')
+          .should('be.visible')
+          .and('contain', 'Mensagem enviada com sucesso.')
+          .invoke('hide')
+          .should('not.be.visible')
+        cy.get('.error')
+          .should('not.be.visible')
+          .invoke('show')
+          .should('be.visible')
+          .and('contain', 'Valide os campos obrigatórios!')
+          .invoke('hide')
+          .should('not.be.visible')
+      })
+
+      //A funcionalidade _.repeat() serve para repetir uma string um certo número de vezes, onde o primeiro argumento é a string a qual deseja-se repetir, e o segundo argumento quantas vezes tal string deve ser repetida.
+      it('preenche a area de texto usando o comando invoke', () => {
+        const longText = Cypress._.repeat('0123456789', 20)
+        cy.get('#open-text-area')
+            .invoke('val', longText)
+            .should('have.value', longText)
+      });
+
+      it('faz uma requisição HTTP', () => {
+        cy.request('https://cac-tat.s3.eu-central-1.amazonaws.com/index.html')  
+        .should((response) => {
+            const {status, statusText, body} = response
+            expect(status).to.equal(200)
+            expect(statusText).to.equal('OK')
+            expect(body).to.include('CAC TAT')
+        })
+      });
+
+      it.only('Encontro o gato escondido com .invoke', () => {
+        cy.get('#cat')
+            .should('not.be.visible')
+            .invoke('show')
+            .should('be.visible')
+            // .invoke('hide')
+            // .should('not.be.visible')
+        cy.get('#title')
+            .invoke('text', 'CAT TAT')
+        cy.get('#subtitle')
+            .invoke('text', 'Eu 💙 Gatinhos')
+      })
 });
